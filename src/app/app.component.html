@@ -1,0 +1,35 @@
+<!-- Navigation Bar - Optimized for mobile: core links always visible -->
+<nav class="navbar" [class.bg-dark]="darkMode" [class.bg-light]="!darkMode">
+  <div class="container">
+    <!-- Brand + always-visible core links (Books & Quotes) -->
+    <div class="d-flex flex-wrap align-items-center w-100">
+      <!-- App brand -->
+      <a class="navbar-brand me-3" [class.text-white]="darkMode">📚 Book & Quote Manager</a>
+
+      <!-- Core navigation links: always visible, never collapsed -->
+      <div class="core-nav-links ms-auto me-3">
+        <a class="nav-link d-inline-block me-3" routerLink="/books" routerLinkActive="active" [class.text-white]="darkMode">
+          📖 My Books
+        </a>
+        <a class="nav-link d-inline-block" routerLink="/quotes" routerLinkActive="active" [class.text-white]="darkMode">
+          💬 My Quotes
+        </a>
+      </div>
+
+      <!-- Right side buttons: theme toggle + logout (wrap on mobile) -->
+      <div class="action-buttons d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary theme-toggle" (click)="toggleDarkMode()">
+          {{ darkMode ? '☀️' : '🌙' }}
+        </button>
+        @if (isLoggedIn) {
+          <button class="btn btn-sm btn-danger" (click)="logout()">🚪</button>
+        }
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Router outlet for all page content -->
+<div class="container mt-4">
+  <router-outlet></router-outlet>
+</div>
