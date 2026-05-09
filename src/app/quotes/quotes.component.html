@@ -1,0 +1,82 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quotes Collection</title>
+</head>
+<body>
+<div class="row">
+  <div class="col-12">
+    <!-- Page Title -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h2>💬 My Quote Collection</h2>
+      <button class="btn btn-primary" (click)="toggleForm()">
+        {{ showForm ? 'Cancel' : 'Add Quote' }}
+      </button>
+    </div>
+
+    <!-- Add/Edit Form -->
+    @if (showForm) {
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title mb-3">{{ editingQuote ? '✏️ Edit Quote' : '💭 Add New Quote' }}</h4>
+
+          <!-- Form Fields -->
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label class="form-label">Quote Text</label>
+              <textarea [(ngModel)]="currentQuote.text"
+                        class="form-control"
+                        rows="9"
+                        placeholder="Enter your favorite quote..."></textarea>
+            </div>
+            <div class="col-12 mb-3">
+              <label class="form-label">Author / Source</label>
+              <input [(ngModel)]="currentQuote.author"
+                     class="form-control"
+                     placeholder="e.g., Confucius, Shakespeare, a book title">
+            </div>
+          </div>
+
+          <!-- Form Buttons -->
+          <div class="d-flex gap-2">
+            <button class="btn btn-success" (click)="saveQuote()">💾 Save</button>
+            <button class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Quote List -->
+    @if (quotes.length === 0) {
+      <div class="text-center py-5">
+        <p class="text-muted">No quotes yet. Click "Add Quote" to start collecting!</p>
+      </div>
+    }
+
+    <div class="row">
+      @for (quote of quotes; track quote.id) {
+        <div class="col-12 col-md-6 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <div class="text-center mb-3">
+                <span style="font-size: 2rem;">"</span>
+              </div>
+              <p class="card-text fs-5 fst-italic text-center">
+                {{ quote.text }}
+              </p>
+              <p class="card-text text-center text-muted mt-3">
+                — {{ quote.author || 'Anonymous' }}
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-0 text-center pb-3">
+              <button class="btn btn-sm btn-warning me-2" (click)="editQuote(quote)">✏️ Edit</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteQuote(quote.id)">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+</body>
+</html>

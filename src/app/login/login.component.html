@@ -1,0 +1,69 @@
+
+<div class="row justify-content-center min-vh-75 align-items-center">
+  <div class="col-12 col-md-6 col-lg-4">
+    <div class="card shadow-lg border-0">
+      <div class="card-body p-5">
+        <h2 class="text-center mb-4">📚 Welcome</h2>
+
+        @if (showRegister) {
+          <div>
+            <h4 class="text-center mb-3">Create New Account</h4>
+
+            <input [(ngModel)]="registerUsername"
+                   class="form-control mb-3"
+                   placeholder="Username"
+                   autocomplete="off"
+                   (keyup.enter)="register()">
+
+            <input [(ngModel)]="registerPassword"
+                   type="password"
+                   class="form-control mb-3"
+                   placeholder="Password"
+                   autocomplete="new-password"
+                   (keyup.enter)="register()">
+
+            <button class="btn btn-success w-100 mb-2" (click)="register()">
+              📝 Register
+            </button>
+
+            <button class="btn btn-link w-100" (click)="showRegister = false">
+              ← Back to Login
+            </button>
+          </div>
+        } @else {
+          <div>
+            <input [(ngModel)]="username"
+                   class="form-control mb-3"
+                   placeholder="Username"
+                   autocomplete="off"
+                   (keyup.enter)="login()">
+
+            <input [(ngModel)]="password"
+                   type="password"
+                   class="form-control mb-3"
+                   placeholder="Password"
+                   autocomplete="new-password"
+                   (keyup.enter)="login()">
+
+            <button class="btn btn-primary w-100 mb-2" (click)="login()">
+              🔐 Login
+            </button>
+
+            <button class="btn btn-link w-100" (click)="showRegister = true">
+              Don't have an account? Sign up
+            </button>
+          </div>
+        }
+
+        @if (message) {
+          <div class="alert mt-3"
+               [class.alert-danger]="isError"
+               [class.alert-success]="!isError">
+            {{ message }}
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
