@@ -3,8 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import {environment} from '../../environments/environment';
-
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -31,15 +30,12 @@ export class LoginComponent {
     }).subscribe({
       next: (response: any) => {
         localStorage.setItem('token', response.token);
-
         this.message = 'Login successful!';
         this.isError = false;
-
-        // Empty the text boxes
         this.username = '';
         this.password = '';
 
-        setTimeout(() => this.router.navigate(['/books']), 1000);
+        setTimeout(() => this.router.navigate(['/books']), 2000);
       },
       error: (err) => {
         let errorMsg = 'Login failed: Incorrect username or password';
@@ -48,60 +44,79 @@ export class LoginComponent {
         } else if (err.error && err.error.message) {
           errorMsg = err.error.message;
         }
-
         this.message = errorMsg;
         this.isError = true;
-
-        // Empty the text boxes
         this.username = '';
         this.password = '';
 
-        setTimeout(() => this.message = '', 1000);
+        setTimeout(() => this.message = '', 3000);
       }
     });
   }
 
+  // ==================== MODIFIED REGISTER METHOD ====================
   register() {
+    // 1. Basic validation
     if (!this.registerUsername.trim() || !this.registerPassword.trim()) {
       this.message = 'Username and password cannot be empty';
       this.isError = true;
-      setTimeout(() => this.message = '', 1000);
+      setTimeout(() => this.message = '', 3000);
       return;
     }
 
     const newUser = this.registerUsername;
     const newPass = this.registerPassword;
 
-    // Empty the text boxes on click the register button
+    // 2. Clear input fields immediately
     this.registerUsername = '';
     this.registerPassword = '';
 
+    // 3. Send registration request
     this.http.post(`${environment.apiUrl}/api/auth/register`, {
       username: newUser,
       password: newPass
     }).subscribe({
-      next: () => {
-        this.message = 'Registration successful!';
+      next: (response: any) => {
+        // ---- FIX: Backend now returns JSON like { message: "User created successfully." } ----
+        // Angular can parse it without error, so we reach here.
+        console.log('Registration success:', response);
+
+        // Use the backend message if available, otherwise fallback
+        const successMsg = response?.message || 'Registration successful!';
+        this.message = successMsg;
         this.isError = false;
 
+        // Keep the success message visible for 3 seconds, then clear it
         setTimeout(() => {
           this.message = '';
-          this.showRegister = false;
-        }, 1000);
+        }, 3000);
+
+        // Optional:Automatically switch back to login after 3 seconds
+
+        //setTimeout(() => this.showRegister = false, 3000);
       },
       error: (err) => {
-        let errorMsg = 'Registration failed: Username may already exist.';
-        if (err.error && typeof err.error === 'string') {
-          errorMsg = err.error;
-        } else if (err.error && err.error.message) {
+        // ---- Handle error responses (e.g., 400 Bad Request with JSON body) ----
+        console.error('Registration error:', err);
+
+        let errorMsg = 'Registration failed. Please try again.';
+
+        // Extract error message from backend JSON response if possible
+        if (err.error && typeof err.error === 'object' && err.error.message) {
           errorMsg = err.error.message;
+        } else if (err.error && typeof err.error === 'string') {
+          errorMsg = err.error;
+        } else if (err.message) {
+          errorMsg = err.message;
         }
 
         this.message = errorMsg;
         this.isError = true;
 
-        setTimeout(() => this.message = '', 1000);
+        // Clear error message after 3 seconds
+        setTimeout(() => this.message = '', 3000);
       }
     });
   }
+  // ==================== END OF MODIFIED REGISTER METHOD ====================
 }
