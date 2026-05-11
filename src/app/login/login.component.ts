@@ -23,6 +23,7 @@ export class LoginComponent {
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  // ==================== LOGIN ====================
   login() {
     this.http.post(`${environment.apiUrl}/api/auth/login`, {
       username: this.username,
@@ -54,7 +55,7 @@ export class LoginComponent {
     });
   }
 
-  // ==================== MODIFIED REGISTER METHOD ====================
+  // ==================== REGISTER (FIXED VERSION) ====================
   register() {
     // 1. Basic validation
     if (!this.registerUsername.trim() || !this.registerPassword.trim()) {
@@ -67,41 +68,38 @@ export class LoginComponent {
     const newUser = this.registerUsername;
     const newPass = this.registerPassword;
 
-    // 2. Clear input fields immediately
-    this.registerUsername = '';
-    this.registerPassword = '';
+    // ❌ FIXED: DO NOT clear input fields before sending the request.
+    // Doing so causes Angular to think the fields are empty and triggers error UI.
+    // this.registerUsername = '';
+    // this.registerPassword = '';
 
-    // 3. Send registration request
     this.http.post(`${environment.apiUrl}/api/auth/register`, {
       username: newUser,
       password: newPass
     }).subscribe({
       next: (response: any) => {
-        // ---- FIX: Backend now returns JSON like { message: "User created successfully." } ----
-        // Angular can parse it without error, so we reach here.
         console.log('Registration success:', response);
 
-        // Use the backend message if available, otherwise fallback
+        // Use backend message if available
         const successMsg = response?.message || 'Registration successful!';
         this.message = successMsg;
         this.isError = false;
 
-        // Keep the success message visible for 3 seconds, then clear it
+        // ✅ FIXED: Clear input fields AFTER successful registration
+        // This prevents UI from showing "failure" due to empty fields.
+        this.registerUsername = '';
+        this.registerPassword = '';
+
+        // Clear success message after 3 seconds
         setTimeout(() => {
           this.message = '';
         }, 3000);
-
-        // Optional:Automatically switch back to login after 3 seconds
-
-        //setTimeout(() => this.showRegister = false, 3000);
       },
       error: (err) => {
-        // ---- Handle error responses (e.g., 400 Bad Request with JSON body) ----
         console.error('Registration error:', err);
 
         let errorMsg = 'Registration failed. Please try again.';
 
-        // Extract error message from backend JSON response if possible
         if (err.error && typeof err.error === 'object' && err.error.message) {
           errorMsg = err.error.message;
         } else if (err.error && typeof err.error === 'string') {
@@ -118,5 +116,5 @@ export class LoginComponent {
       }
     });
   }
-  // ==================== END OF MODIFIED REGISTER METHOD ====================
+  // ==================== END REGISTER ====================
 }
