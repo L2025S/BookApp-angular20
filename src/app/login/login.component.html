@@ -1,4 +1,4 @@
-
+<!-- CHANGE: Added template-driven validation and error messages -->
 <div class="row justify-content-center min-vh-75 align-items-center">
   <div class="col-12 col-md-6 col-lg-4">
     <div class="card shadow-lg border-0">
@@ -9,20 +9,46 @@
           <div>
             <h4 class="text-center mb-3">Create New Account</h4>
 
+            <!-- Register Username input with validations -->
             <input [(ngModel)]="registerUsername"
-                   class="form-control mb-3"
+                   #regUsername="ngModel"
+                   name="regUsername"
+                   type="text"
+                   class="form-control mb-1"
                    placeholder="Username"
                    autocomplete="off"
+                   required
+                   minlength="3"
+                   maxlength="50"
                    (keyup.enter)="register()">
+            <!-- Error messages -->
+            <div *ngIf="regUsername.invalid && (regUsername.dirty || regUsername.touched)" class="text-danger small mb-3">
+              <div *ngIf="regUsername.errors?.['required']">Username is required.</div>
+              <div *ngIf="regUsername.errors?.['minlength']">Username must be at least 3 characters.</div>
+              <div *ngIf="regUsername.errors?.['maxlength']">Username cannot exceed 50 characters.</div>
+            </div>
 
+            <!-- Register Password input with validations -->
             <input [(ngModel)]="registerPassword"
+                   #regPassword="ngModel"
+                   name="regPassword"
                    type="password"
-                   class="form-control mb-3"
+                   class="form-control mb-1"
                    placeholder="Password"
                    autocomplete="new-password"
+                   required
+                   minlength="8"
+                   maxlength="100"
                    (keyup.enter)="register()">
+            <!-- Error messages -->
+            <div *ngIf="regPassword.invalid && (regPassword.dirty || regPassword.touched)" class="text-danger small mb-3">
+              <div *ngIf="regPassword.errors?.['required']">Password is required.</div>
+              <div *ngIf="regPassword.errors?.['minlength']">Password must be at least 8 characters.</div>
+              <div *ngIf="regPassword.errors?.['maxlength']">Password cannot exceed 100 characters.</div>
+            </div>
 
-            <button class="btn btn-success w-100 mb-2" (click)="register()">
+            <button class="btn btn-success w-100 mb-2" (click)="register()"
+                    [disabled]="regUsername.invalid || regPassword.invalid">
               📝 Register
             </button>
 
@@ -66,4 +92,3 @@
     </div>
   </div>
 </div>
-

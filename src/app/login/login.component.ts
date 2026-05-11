@@ -55,23 +55,26 @@ export class LoginComponent {
     });
   }
 
-  // ==================== REGISTER (FIXED VERSION) ====================
+  // ==================== REGISTER (WITH FRONTEND VALIDATION) ====================
   register() {
-    // 1. Basic validation
-    if (!this.registerUsername.trim() || !this.registerPassword.trim()) {
-      this.message = 'Username and password cannot be empty';
+    // CHANGE: The HTML template already validates length requirements via minlength/maxlength.
+    // However, also keep a safety check in TS to prevent submission if validation fails.
+    const isUsernameValid = this.registerUsername &&
+      this.registerUsername.trim().length >= 3 &&
+      this.registerUsername.trim().length <= 50;
+    const isPasswordValid = this.registerPassword &&
+      this.registerPassword.length >= 8 &&
+      this.registerPassword.length <= 100;
+
+    if (!isUsernameValid || !isPasswordValid) {
+      this.message = 'Please ensure username is 3-50 chars and password is 8-100 chars.';
       this.isError = true;
       setTimeout(() => this.message = '', 3000);
       return;
     }
 
-    const newUser = this.registerUsername;
+    const newUser = this.registerUsername.trim();
     const newPass = this.registerPassword;
-
-    // ❌ FIXED: DO NOT clear input fields before sending the request.
-    // Doing so causes Angular to think the fields are empty and triggers error UI.
-    // this.registerUsername = '';
-    // this.registerPassword = '';
 
     this.http.post(`${environment.apiUrl}/api/auth/register`, {
       username: newUser,
@@ -80,26 +83,23 @@ export class LoginComponent {
       next: (response: any) => {
         console.log('Registration success:', response);
 
-        // Use backend message if available
         const successMsg = response?.message || 'Registration successful!';
         this.message = successMsg;
         this.isError = false;
 
-        // ✅ FIXED: Clear input fields AFTER successful registration
-        // This prevents UI from showing "failure" due to empty fields.
         this.registerUsername = '';
         this.registerPassword = '';
 
-        // Clear success message after 3 seconds
         setTimeout(() => {
           this.message = '';
+          // Optionally switch to login view after success
+          this.showRegister = false;
         }, 3000);
       },
       error: (err) => {
         console.error('Registration error:', err);
 
-        let errorMsg = 'Registration failed. Please try again.';
-
+        let errorMsg = 'Registration failed. ';
         if (err.error && typeof err.error === 'object' && err.error.message) {
           errorMsg = err.error.message;
         } else if (err.error && typeof err.error === 'string') {
@@ -111,10 +111,8 @@ export class LoginComponent {
         this.message = errorMsg;
         this.isError = true;
 
-        // Clear error message after 3 seconds
         setTimeout(() => this.message = '', 3000);
       }
     });
   }
-  // ==================== END REGISTER ====================
 }
